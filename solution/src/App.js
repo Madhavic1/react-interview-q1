@@ -1,73 +1,35 @@
-import './App.css';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
-import { useState, useEffect } from 'react';
-import { isNameValid, getLocations } from './mock-api/apis';
+// import './App.css';
+import { useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.css';
+import {Container }from 'react-bootstrap';
+import FormComponent from './components/FormComponent';
+import ListComponent from './components/ListComponent';
 
 function App() {
-  const [name, setName] = useState('');
-  const [error, setError] = useState(false);
-  const [locations, setLocations] = useState([]);
-  const [selectedLocation, setSelectedLocation] = useState('');
   const [formData, setFormData] = useState([]);
 
-  useEffect(() => {
-    const fetchLocations = async () => {
-      const locationApiResponse = await getLocations();
-      console.log(locationApiResponse);
-      setLocations(locationApiResponse)
-    }
-    fetchLocations();
-  }, [])
-  const nameOnchangeHandler = (e) => {
-    validateTheName(e.target.value);
-    setName(e.target.value);
-  }
-
-  const validateTheName= async (value) => {
-    const isValidName = await isNameValid(value)
-    if(!isValidName){
-      setError(true)
-    }
-  }
-
-  const addOnclickHandler = (e) => {
+  /**
+   * updateFormData()
+   * @param {*} e 
+   * This function will be called on Add button click, grabs the form data entered by the user and updates the formData state variable.
+   */
+  const updateFormData = (data) => {
     //adds the form data to the formData state array
-    e.preventDefault();
-  
+    setFormData([...formData, data]);
   }
 
-  const clearOnclickHandler = () => {
-    //clears all data
-    setName('');
-    setError(false)
-  }
   return (
-    <>
-      <Form>
-          <Form.Group className="mb-3" controlId="formBasicInput">
-            <Form.Label>Name</Form.Label>
-            <Form.Control type="text" value={name} placeholder="Enter Name" onChange={nameOnchangeHandler}/>
-            {error ? <Form.Control.Feedback type="valid" style={{color: "red"}}>
-              The name has already been taken.
-            </Form.Control.Feedback>: null}
-          </Form.Group>
-
-          <Form.Group className="mb-3" controlId="formBasicLocation">
-            <Form.Label>Location</Form.Label>
-            <Form.Select size="lg" value={selectedLocation} onChange={(e)=> setSelectedLocation(e.target.value)}>
-              {
-                locations.map((location, index) => <option key={index}>{location}</option>)
-              }
-            </Form.Select>
-            <br />
-          </Form.Group>
-
-          <Button onClick={clearOnclickHandler}>Clear</Button>
-          <Button onClick={addOnclickHandler}>Add</Button>
-      </Form>
-
-    </>
+    // react-bootstrap components are being used to render the Form to get the responsiveness.
+    <Container  style={{paddingTop: '50px'}}>
+      <FormComponent updateFormData={updateFormData} />
+     {
+      // The list will be displayed only when the user has entered any input and clicks on Add button.
+      formData.length>0 
+      ? 
+      <ListComponent formData={formData}/> 
+     : null
+     }  
+    </Container>
   );
 }
 
